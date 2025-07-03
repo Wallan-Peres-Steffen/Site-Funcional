@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Site com Local Storage</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            background-color: #f4f4f4;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        #preferencesForm {
+            margin-top: 20px;
+        }
+        #savedData {
+            background-color: #e9e9e9;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+        .theme-dark {
+            background-color: #333;
+            color: #fff;
+        }
+        .theme-dark .container {
+            background-color: #444;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Demonstração de Local Storage e Event Listeners</h1>
+        
+        <h2>Preferências do Usuário</h2>
+        <form id="preferencesForm">
+            <label for="username">Nome de Usuário:</label>
+            <input type="text" id="username" name="username">
+            
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email">
+            
+            <label for="theme">Tema:</label>
+            <select id="theme" name="theme">
+                <option value="light">Claro</option>
+                <option value="dark">Escuro</option>
+            </select>
+            
+            <label for="notifications">Receber notificações?</label>
+            <input type="checkbox" id="notifications" name="notifications">
+            
+            <button type="submit">Salvar Preferências</button>
+            <button type="button" id="clearBtn">Limpar Dados</button>
+        </form>
+        
+        <div id="savedData">
+            <h3>Dados Armazenados:</h3>
+            <p id="displayData">Nenhum dado armazenado ainda.</p>
+        </div>
+    </div>
+    
+    <div class="container">
+        <h2>Contador de Cliques</h2>
+        <p>Clique no botão abaixo para incrementar o contador:</p>
+        <button id="counterBtn">Clique Aqui</button>
+        <p>Total de cliques: <span id="clickCount">0</span></p>
+    </div>
+    
+    <div class="container">
+        <h2>Lista de Tarefas</h2>
+        <input type="text" id="taskInput" placeholder="Digite uma nova tarefa">
+        <button id="addTaskBtn">Adicionar Tarefa</button>
+        <ul id="taskList"></ul>
+    </div>
+
+    <script>
+        // Carregar dados do Local Storage quando a página é carregada
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUserPreferences();
+            loadClickCounter();
+            loadTasks();
+            
+            // Verificar e aplicar o tema salvo
+            applyTheme();
+        });
+
+        // Formulário de preferências
+        const preferencesForm = document.getElementById('preferencesForm');
+        preferencesForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const theme = document.getElementById('theme').value;
+            const notifications = document.getElementById('notifications').checked;
+            
+            // Salvar no Local Storage
+            localStorage.setItem('username', username);
+            localStorage.setItem('email', email);
+            localStorage.setItem('theme', theme);
+            localStorage.setItem('notifications', notifications);
+            
+            // Aplicar o tema imediatamente
+            applyTheme();
+            
+            // Atualizar a exibição dos dados salvos
+            displaySavedData();
+            
+            alert('Preferências salvas com sucesso!');
+        });
+
+        // Botão para limpar dados
+        document.getElementById('clearBtn').addEventListener('click', function() {
+            if (confirm('Tem certeza que deseja limpar todos os dados armazenados?')) {
+                localStorage.clear();
+                displaySavedData();
+                document.getElementById('clickCount').textContent = '0';
+                document.getElementById('taskList').innerHTML = '';
+                alert('Todos os dados foram removidos.');
+            }
+        });
+
+        // Contador de cliques
+        document.getElementById('counterBtn').addEventListener('click', function() {
+            let count = localStorage.getItem('clickCount') || 0;
+            count = parseInt(count) + 1;
+            localStorage.setItem('clickCount', count);
+            document.getElementById('clickCount').textContent = count;
+        });
+
+        // Lista de tarefas
+        document.getElementById('addTaskBtn').addEventListener('click', function() {
+            const taskInput = document.getElementById('taskInput');
+            const task = taskInput.value.trim();
+            
+            if (task) {
+                addTask(task);
+                taskInput.value = '';
+            }
+        });
+
+        // Também adicionar tarefa ao pressionar Enter
+        document.getElementById('taskInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const taskInput = document.getElementById('taskInput');
+                const task = taskInput.value.trim();
+                
+                if (task) {
+                    addTask(task);
+                    taskInput.value = '';
+                }
+            }
+        });
+
+        // Funções auxiliares
+        function loadUserPreferences() {
+            const username = localStorage.getItem('username') || '';
+            const email = localStorage.getItem('email') || '';
+            const theme = localStorage.getItem('theme') || 'light';
+            const notifications = localStorage.getItem('notifications') === 'true';
+            
+            document.getElementById('username').value = username;
+            document.getElementById('email').value = email;
+            document.getElementById('theme').value = theme;
+            document.getElementById('notifications').checked = notifications;
+            
+            displaySavedData();
+        }
+
+        function loadClickCounter() {
+            const count = localStorage.getItem('clickCount') || 0;
+            document.getElementById('clickCount').textContent = count;
+        }
+
+        function loadTasks() {
+            const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            const taskList = document.getElementById('taskList');
+            taskList.innerHTML = '';
+            
+            tasks.forEach((task, index) => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    ${task}
+                    <button class="delete-task" data-index="${index}">×</button>
+                `;
+                taskList.appendChild(li);
+            });
+            
+            // Adicionar event listeners aos botões de deletar
+            document.querySelectorAll('.delete-task').forEach(button => {
+                button.addEventListener('click', function() {
+                    const index = parseInt(this.getAttribute('data-index'));
+                    deleteTask(index);
+                });
+            });
+        }
+
+        function addTask(task) {
+            const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            tasks.push(task);
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+            loadTasks();
+        }
+
+        function deleteTask(index) {
+            const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            tasks.splice(index, 1);
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+            loadTasks();
+        }
+
+        function displaySavedData() {
+            const displayElement = document.getElementById('displayData');
+            const username = localStorage.getItem('username');
+            const email = localStorage.getItem('email');
+            const theme = localStorage.getItem('theme');
+            const notifications = localStorage.getItem('notifications');
+            
+            if (!username && !email) {
+                displayElement.textContent = 'Nenhum dado armazenado ainda.';
+                return;
+            }
+            
+            let html = `
+                <p><strong>Nome de Usuário:</strong> ${username || 'Não informado'}</p>
+                <p><strong>Email:</strong> ${email || 'Não informado'}</p>
+                <p><strong>Tema:</strong> ${theme === 'dark' ? 'Escuro' : 'Claro'}</p>
+                <p><strong>Notificações:</strong> ${notifications === 'true' ? 'Ativadas' : 'Desativadas'}</p>
+            `;
+            
+            displayElement.innerHTML = html;
+        }
+
+        function applyTheme() {
+            const theme = localStorage.getItem('theme') || 'light';
+            if (theme === 'dark') {
+                document.body.classList.add('theme-dark');
+            } else {
+                document.body.classList.remove('theme-dark');
+            }
+        }
+    </script>
+</body>
+</html>
