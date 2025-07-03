@@ -60,7 +60,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Demonstração de Local Storage e Event Listeners</h1>
+        <h1>Oi Pessoas! Aproveitem! Hihi :)</h1>
         
         <h2>Preferências do Usuário</h2>
         <form id="preferencesForm">
@@ -104,45 +104,45 @@
     </div>
 
     <script>
-        // Carregar dados do Local Storage quando a página é carregada
+        // ==============================================
+        // EVENT LISTENERS :)
+        // ==============================================
+        
+        // 1. EventListener para quando o DOM é carregado
         document.addEventListener('DOMContentLoaded', function() {
-            loadUserPreferences();
-            loadClickCounter();
-            loadTasks();
-            
-            // Verificar e aplicar o tema salvo
-            applyTheme();
+            loadUserPreferences();  // Carrega preferências do localStorage
+            loadClickCounter();    // Carrega contador do localStorage
+            loadTasks();           // Carrega tarefas do localStorage
+            applyTheme();         // Aplica tema salvo no localStorage
         });
 
-        // Formulário de preferências
+        // 2. EventListener para submit do formulário de preferências
         const preferencesForm = document.getElementById('preferencesForm');
         preferencesForm.addEventListener('submit', function(e) {
             e.preventDefault();
             
+            // Obtém valores dos inputs, os troço lá
             const username = document.getElementById('username').value;
             const email = document.getElementById('email').value;
             const theme = document.getElementById('theme').value;
             const notifications = document.getElementById('notifications').checked;
             
-            // Salvar no Local Storage
+            // Salva no localStorage...
             localStorage.setItem('username', username);
             localStorage.setItem('email', email);
             localStorage.setItem('theme', theme);
             localStorage.setItem('notifications', notifications);
             
-            // Aplicar o tema imediatamente
-            applyTheme();
-            
-            // Atualizar a exibição dos dados salvos
-            displaySavedData();
+            applyTheme();          // Aplica o tema 
+            displaySavedData();    // Atualiza os dados visíveis
             
             alert('Preferências salvas com sucesso!');
         });
 
-        // Botão para limpar dados
+        // 3. EventListener para botão de limpar dados
         document.getElementById('clearBtn').addEventListener('click', function() {
             if (confirm('Tem certeza que deseja limpar todos os dados armazenados?')) {
-                localStorage.clear();
+                localStorage.clear();  // Limpa o localStorage
                 displaySavedData();
                 document.getElementById('clickCount').textContent = '0';
                 document.getElementById('taskList').innerHTML = '';
@@ -150,39 +150,43 @@
             }
         });
 
-        // Contador de cliques
+        // 4. EventListener para botão do contador de cliques
         document.getElementById('counterBtn').addEventListener('click', function() {
-            let count = localStorage.getItem('clickCount') || 0;
+            let count = localStorage.getItem('clickCount') || 0;  // Obtém do localStorage
             count = parseInt(count) + 1;
-            localStorage.setItem('clickCount', count);
+            localStorage.setItem('clickCount', count);  // Atualiza no localStorage
             document.getElementById('clickCount').textContent = count;
         });
 
-        // Lista de tarefas
+        // 5. EventListener para botão de adicionar tarefa
         document.getElementById('addTaskBtn').addEventListener('click', function() {
             const taskInput = document.getElementById('taskInput');
             const task = taskInput.value.trim();
             
             if (task) {
-                addTask(task);
+                addTask(task);  // Adiciona tarefa ao localStorage
                 taskInput.value = '';
             }
         });
 
-        // Também adicionar tarefa ao pressionar Enter
+        // 6. EventListener para tecla Enter no input de tarefas
         document.getElementById('taskInput').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 const taskInput = document.getElementById('taskInput');
                 const task = taskInput.value.trim();
                 
                 if (task) {
-                    addTask(task);
+                    addTask(task);  // Adiciona tarefa ao localStorage
                     taskInput.value = '';
                 }
             }
         });
 
-        // Funções auxiliares
+        // ==============================================
+        // FUNÇÕES QUE UTILIZAM LOCALSTORAGE
+        // ==============================================
+
+        // Carrega preferências do usuário do localStorage
         function loadUserPreferences() {
             const username = localStorage.getItem('username') || '';
             const email = localStorage.getItem('email') || '';
@@ -197,11 +201,13 @@
             displaySavedData();
         }
 
+        // Carrega contador de cliques do localStorage
         function loadClickCounter() {
             const count = localStorage.getItem('clickCount') || 0;
             document.getElementById('clickCount').textContent = count;
         }
 
+        // Carrega tarefas do localStorage
         function loadTasks() {
             const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
             const taskList = document.getElementById('taskList');
@@ -216,15 +222,16 @@
                 taskList.appendChild(li);
             });
             
-            // Adicionar event listeners aos botões de deletar
+            // Adiciona event listeners para os botões de deletar tarefa
             document.querySelectorAll('.delete-task').forEach(button => {
                 button.addEventListener('click', function() {
                     const index = parseInt(this.getAttribute('data-index'));
-                    deleteTask(index);
+                    deleteTask(index);  // Remove tarefa do localStorage
                 });
             });
         }
 
+        // Adiciona tarefa ao localStorage
         function addTask(task) {
             const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
             tasks.push(task);
@@ -232,6 +239,7 @@
             loadTasks();
         }
 
+        // Remove tarefa do localStorage
         function deleteTask(index) {
             const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
             tasks.splice(index, 1);
@@ -239,6 +247,7 @@
             loadTasks();
         }
 
+        // Exibe dados salvos no localStorage
         function displaySavedData() {
             const displayElement = document.getElementById('displayData');
             const username = localStorage.getItem('username');
@@ -261,6 +270,7 @@
             displayElement.innerHTML = html;
         }
 
+        // Aplica tema baseado no valor salvo no localStorage
         function applyTheme() {
             const theme = localStorage.getItem('theme') || 'light';
             if (theme === 'dark') {
