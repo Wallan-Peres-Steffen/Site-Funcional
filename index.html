@@ -79,6 +79,9 @@
             color: rgb(255, 255, 255);
         }
 
+        .theme-colorblind .savedData {
+            color: #000000;
+        }
     </style>
 </head>
 
@@ -117,7 +120,8 @@
     <div class="container">
         <h2>Contador de Cliques</h2>
         <p>Clique no botão abaixo para incrementar o contador:</p>
-        <button id="counterBtn">Clique Aqui</button>
+        <button id="counterBtn">Clique Aqui +</button>
+        <button id="counterBtn2">Clique Aqui -</button>
         <p>Total de cliques: <span id="clickCount">0</span></p>
     </div>
 
@@ -182,6 +186,13 @@
             localStorage.setItem('clickCount', count);  // Atualiza no localStorage
             document.getElementById('clickCount').textContent = count;
         });
+
+        document.getElementById('counterBtn2').addEventListener('click', function () {
+                let count = localStorage.getItem('clickCount') || 0;  // Obtém do localStorage
+                count = parseInt(count) - 1;
+                localStorage.setItem('clickCount', count);  // Atualiza no localStorage
+                document.getElementById('clickCount').textContent = count;
+            });
 
         // 5. EventListener para botão de adicionar tarefa
         document.getElementById('addTaskBtn').addEventListener('click', function () {
